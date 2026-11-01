@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENGINEERS — Universal Study & Work Hub</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            engineers: {
+              bg: '#090d16',
+              card: '#101726',
+              border: '#1e293b',
+              accent: '#06b6d4'
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Syntax Highlighting & Markdown -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+    .drag-hover { border-color: #0ea5e9 !important; background-color: rgba(14, 165, 233, 0.05) !important; }
+    pre code.hljs { border-radius: 0.5rem; padding: 1rem; background: #090d16 !important; }
+  </style>
+</head>
+
+<body class="bg-[#090d16] text-slate-200 font-sans antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden" id="appBody">
+
+  <!-- Mobile Top Header -->
+  <div class="md:hidden flex items-center justify-between p-4 bg-[#101726] border-b border-engineers-border">
+    <div class="flex items-center space-x-2">
+      <div class="p-2 bg-sky-950/80 border border-sky-500/40 rounded-lg text-sky-400">
+        <i data-lucide="cpu" class="w-5 h-5"></i>
+      </div>
+      <span class="font-extrabold tracking-widest text-white text-lg font-mono">ENGINEERS</span>
+    </div>
+    <button id="mobileMenuBtn" class="p-2 text-slate-400 hover:text-white">
+      <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
+  </div>
+
+  <!-- Sidebar Component -->
+  <aside id="sidebar" class="hidden md:flex flex-col w-72 bg-[#0c1220] border-r border-engineers-border shrink-0 min-h-screen p-5 transition-all duration-300 z-30">
+    <!-- Brand -->
+    <div class="flex items-center space-x-3 mb-6">
+      <div class="p-2.5 bg-sky-950 border border-sky-500/40 rounded-xl text-sky-400 shadow-[0_0_20px_rgba(14,165,233,0.2)]">
+        <i data-lucide="cpu" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="font-black text-white tracking-widest text-lg font-mono">ENGINEERS</h1>
+        <p class="text-[10px] text-sky-400/80 font-mono tracking-wide uppercase">Workspace • High Capacity</p>
+      </div>
+    </div>
+
+    <!-- Core Workspaces Selector -->
+    <div class="mb-5 space-y-1">
+      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1 block">Workspaces</span>
+      <div class="grid grid-cols-2 gap-1.5">
+        <button onclick="setWorkspace('study')" id="ws-study" class="ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold bg-sky-950/70 text-sky-300 border border-sky-500/40">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+          <span>Study</span>
+        </button>
+        <button onclick="setWorkspace('work')" id="ws-work" class="ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i data-lucide="briefcase" class="w-3.5 h-3.5"></i>
+          <span>Work</span>
+        </button>
+        <button onclick="setWorkspace('code')" id="ws-code" class="ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+          <span>Code</span>
+        </button>
+        <button onclick="setWorkspace('archive')" id="ws-archive" class="ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i data-lucide="archive" class="w-3.5 h-3.5"></i>
+          <span>Archive</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Infinite Subjects / Categories List -->
+    <div class="flex-1 flex flex-col min-h-0 mb-4">
+      <div class="flex items-center justify-between mb-2 px-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Subjects / Topics</span>
+        <button onclick="openCategoryModal()" class="text-sky-400 hover:text-sky-300 p-1 hover:bg-slate-800 rounded transition" title="Add New Subject">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <!-- Scrollable container supporting unlimited subjects -->
+      <div id="categoryNavList" class="flex-1 overflow-y-auto space-y-1 pr-1 max-h-[35vh]"></div>
+    </div>
+
+    <!-- Storage & Upload Actions -->
+    <div class="pt-4 border-t border-engineers-border space-y-2">
+      <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono px-1">
+        <span>VAULT STORAGE</span>
+        <span id="storageSize" class="text-sky-400">0 Items</span>
+      </div>
+
+      <!-- Universal Upload Button -->
+      <label class="w-full flex items-center justify-center space-x-2 py-2.5 px-3 bg-sky-600 hover:bg-sky-500 rounded-lg text-xs font-bold text-white cursor-pointer transition shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+        <span>Upload Any Files / Code</span>
+        <input type="file" id="universalFileInput" multiple class="hidden" onchange="handleFileInput(event)">
+      </label>
+
+      <!-- Backup Export -->
+      <button onclick="exportVault()" class="w-full flex items-center justify-center space-x-2 py-2 px-3 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg text-xs font-medium text-slate-300 transition">
+        <i data-lucide="download" class="w-3.5 h-3.5 text-sky-400"></i>
+        <span>Export Backup Package</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace Area -->
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <!-- Top Action Bar -->
+    <header class="h-16 border-b border-engineers-border px-6 flex items-center justify-between bg-[#0b101c]/95 backdrop-blur shrink-0 gap-4">
+      <div class="relative flex-1 max-w-lg">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search by file name, code snippet, tags (#cpp, #pdf)..." 
+          class="w-full pl-10 pr-4 py-2 bg-engineers-bg border border-engineers-border focus:border-sky-500 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none transition"
+          oninput="handleSearch(this.value)"
+        >
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="openNoteModal()" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-sm px-4 py-2 rounded-lg transition">
+          <i data-lucide="file-plus" class="w-4 h-4 text-sky-400"></i>
+          <span class="hidden sm:inline">Write Document / Note</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace Grid View -->
+    <div class="flex-1 overflow-y-auto p-6 transition-all" id="dropZone">
+      <!-- Breadcrumb Bar -->
+      <div class="flex items-center justify-between mb-6 pb-2 border-b border-engineers-border">
+        <div class="flex items-center space-x-2">
+          <span class="text-xs uppercase font-mono tracking-wider text-slate-400">Workspace:</span>
+          <span id="activeWorkspaceBadge" class="text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-300 font-bold uppercase tracking-wider border border-sky-800/50">STUDY</span>
+          <span id="activeFilterBadge" class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300">All Topics</span>
+        </div>
+        <span class="text-xs text-slate-500 font-mono" id="resultsCount">0 items stored</span>
+      </div>
+
+      <!-- File Cards Grid -->
+      <div id="filesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden flex-col items-center justify-center text-center py-24">
+        <div class="p-4 bg-slate-900/60 rounded-full border border-engineers-border mb-4 text-slate-500">
+          <i data-lucide="folder-code" class="w-10 h-10 text-sky-500/60"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">No files in this workspace</h3>
+        <p class="text-sm text-slate-500 max-w-sm mt-1">Drop any code, study, or work files directly here or click upload to store them.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Document / Note Modal -->
+  <div id="noteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#101726] border border-engineers-border rounded-xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-engineers-border bg-[#0b101c]">
+        <h3 class="font-bold text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-sky-400"></i>
+          <span>Create Document / Entry</span>
+        </h3>
+        <button onclick="closeNoteModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="saveManualNote(event)" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">Title / File Name *</label>
+          <input type="text" id="manualTitle" required placeholder="e.g. Data Structures Summary or Project Plan" class="w-full px-3.5 py-2 bg-engineers-bg border border-engineers-border rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">Subject / Category *</label>
+            <select id="manualCategory" class="w-full px-3.5 py-2 bg-engineers-bg border border-engineers-border rounded-lg text-sm text-white focus:outline-none focus:border-sky-500"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">Format / Syntax</label>
+            <select id="manualSyntax" class="w-full px-3.5 py-2 bg-engineers-bg border border-engineers-border rounded-lg text-sm text-white focus:outline-none focus:border-sky-500 font-mono">
+              <option value="markdown">Markdown / Notes</option>
+              <option value="cpp">C++</option>
+              <option value="python">Python</option>
+              <option value="bash">Bash / Linux</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">Tags (Comma-separated)</label>
+          <input type="text" id="manualTags" placeholder="exam, finals, chapter1, algorithm" class="w-full px-3.5 py-2 bg-engineers-bg border border-engineers-border rounded-lg text-sm text-white focus:outline-none focus:border-sky-500 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">Content *</label>
+          <textarea id="manualContent" required rows="9" placeholder="Type your documentation or paste code here..." class="w-full px-4 py-3 bg-[#090d16] border border-engineers-border rounded-lg text-sm text-slate-200 focus:outline-none focus:border-sky-500 font-mono resize-y"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-engineers-border">
+          <button type="button" onclick="closeNoteModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase rounded-lg">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detail Reader / Viewer Modal -->
+  <div id="viewModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#101726] border border-engineers-border rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-5 border-b border-engineers-border bg-[#0b101c] flex items-start justify-between">
+        <div>
+          <div class="flex items-center space-x-2 mb-1.5">
+            <span id="viewCategoryBadge" class="text-xs px-2.5 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800 font-mono"></span>
+            <span id="viewTypeBadge" class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono uppercase"></span>
+          </div>
+          <h2 id="viewTitle" class="text-lg font-bold text-white tracking-wide"></h2>
+        </div>
+        <div class="flex items-center space-x-2">
+          <a id="downloadFileBtn" href="#" download="" class="px-3 py-1.5 bg-sky-950 hover:bg-sky-900 border border-sky-700/60 text-sky-300 text-xs rounded flex items-center space-x-1.5 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download</span>
+          </a>
+          <button onclick="closeViewModal()" class="p-1.5 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6" id="viewBody"></div>
+    </div>
+  </div>
+
+  <!-- Subject Creator Modal -->
+  <div id="categoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#101726] border border-engineers-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+      <h3 class="font-bold text-white mb-4">Add Subject / Topic</h3>
+      <form onsubmit="handleCreateCategory(event)" class="space-y-4">
+        <input type="text" id="newCategoryInput" required placeholder="e.g. Artificial Intelligence, Networks" class="w-full px-3.5 py-2 bg-engineers-bg border border-engineers-border rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+        <div class="flex justify-end space-x-2">
+          <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase rounded-lg">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center space-x-2 px-4 py-3 rounded-lg shadow-xl border bg-slate-900 border-sky-500/50 text-slate-200 text-xs font-mono">
+    <i data-lucide="check-circle" class="w-4 h-4 text-sky-400"></i>
+    <span id="toastMsg">Success</span>
+  </div>
+
+  <!-- Engine Script -->
+  <script>
+    // State
+    let currentWorkspace = 'study'; // 'study', 'work', 'code', 'archive'
+    let currentCategory = 'all';
+    let searchQuery = '';
+    let db = null;
+    let categories = ["Computer Science", "Algorithms", "Databases", "Web Development", "Operating Systems"];
+    let filesCache = [];
+
+    // Initialize IndexedDB (High Capacity storage for real files)
+    function initDB() {
+      return new Promise((resolve) => {
+        const req = indexedDB.open('EngineersVaultDB', 1);
+        req.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('files')) {
+            database.createObjectStore('files', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = (e) => {
+          db = e.target.result;
+          resolve();
+        };
+      });
+    }
+
+    async function loadVault() {
+      // Load categories
+      const savedCats = localStorage.getItem('engineers_categories');
+      if (savedCats) {
+        try { categories = JSON.parse(savedCats); } catch(e){}
+      }
+
+      // Load files from IndexedDB
+      const transaction = db.transaction(['files'], 'readonly');
+      const store = transaction.objectStore('files');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        filesCache = request.result || [];
+        renderCategories();
+        renderFiles();
+      };
+    }
+
+    function saveCategories() {
+      localStorage.setItem('engineers_categories', JSON.stringify(categories));
+      renderCategories();
+    }
+
+    function setWorkspace(ws) {
+      currentWorkspace = ws;
+      currentCategory = 'all';
+
+      document.querySelectorAll('.ws-btn').forEach(btn => {
+        btn.className = 'ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition';
+      });
+
+      const activeBtn = document.getElementById(`ws-${ws}`);
+      if (activeBtn) {
+        activeBtn.className = 'ws-btn flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold bg-sky-950/70 text-sky-300 border border-sky-500/40';
+      }
+
+      document.getElementById('activeWorkspaceBadge').textContent = ws.toUpperCase();
+      document.getElementById('activeFilterBadge').textContent = 'All Topics';
+      renderFiles();
+    }
+
+    function renderCategories() {
+      const container = document.getElementById('categoryNavList');
+      const manualSelect = document.getElementById('manualCategory');
+      container.innerHTML = '';
+      manualSelect.innerHTML = '';
+
+      // "All" item
+      const allBtn = document.createElement('div');
+      allBtn.className = `flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer transition ${currentCategory === 'all' ? 'bg-sky-950/40 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
+      allBtn.innerHTML = `<span>All Subjects</span>`;
+      allBtn.onclick = () => { currentCategory = 'all'; document.getElementById('activeFilterBadge').textContent = 'All Topics'; renderFiles(); renderCategories(); };
+      container.appendChild(allBtn);
+
+      categories.forEach(cat => {
+        const item = document.createElement('div');
+        const isActive = currentCategory === cat;
+        item.className = `group flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer transition ${isActive ? 'bg-sky-950/40 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
+        item.innerHTML = `
+          <span class="truncate" onclick="selectCategory('${escapeHtml(cat)}')">${escapeHtml(cat)}</span>
+          <button onclick="deleteCategory('${escapeHtml(cat)}', event)" class="opacity-0 group-hover:opacity-100 hover:text-red-400 transition">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+          </button>
+        `;
+        container.appendChild(item);
+
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        manualSelect.appendChild(opt);
+      });
+      lucide.createIcons();
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      document.getElementById('activeFilterBadge').textContent = cat;
+      renderCategories();
+      renderFiles();
+    }
+
+    function renderFiles() {
+      const grid = document.getElementById('filesGrid');
+      const emptyState = document.getElementById('emptyState');
+      grid.innerHTML = '';
+
+      let list = filesCache.filter(f => f.workspace === currentWorkspace);
+
+      if (currentCategory !== 'all') {
+        list = list.filter(f => f.category === currentCategory);
+      }
+
+      if (searchQuery) {
+        list = list.filter(f => f.title.toLowerCase().includes(searchQuery) || (f.tags && f.tags.some(t => t.toLowerCase().includes(searchQuery))));
+      }
+
+      document.getElementById('resultsCount').textContent = `${list.length} items in view`;
+      document.getElementById('storageSize').textContent = `${filesCache.length} Files Saved`;
+
+      if (list.length === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+      } else {
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+
+        list.forEach(file => {
+          const card = document.createElement('div');
+          card.className = "bg-[#101726] border border-engineers-border rounded-xl p-4 flex flex-col justify-between hover:border-sky-500/50 transition cursor-pointer group";
+          card.onclick = (e) => {
+            if (e.target.closest('button')) return;
+            openViewer(file);
+          };
+
+          const icon = file.isCode ? 'code-2' : (file.type && file.type.includes('image') ? 'image' : 'file-text');
+
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950 text-sky-400 font-semibold uppercase tracking-wider">${escapeHtml(file.category)}</span>
+                <button onclick="deleteFile('${file.id}', event)" class="p-1 text-slate-500 hover:text-red-400 transition" title="Delete">
+                  <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div class="flex items-start space-x-2.5 mb-2">
+                <i data-lucide="${icon}" class="w-5 h-5 text-sky-400 shrink-0 mt-0.5"></i>
+                <h4 class="font-bold text-white text-sm tracking-tight truncate group-hover:text-sky-400 transition">${escapeHtml(file.title)}</h4>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-engineers-border flex items-center justify-between text-[11px] font-mono text-slate-500 mt-2">
+              <span>${file.size || 'Text'}</span>
+              <span>${new Date(file.updatedAt).toLocaleDateString()}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    // Process & Store Any File
+    async function storeFile(fileObj) {
+      const tx = db.transaction(['files'], 'readwrite');
+      tx.objectStore('files').put(fileObj);
+      tx.oncomplete = () => {
+        filesCache.unshift(fileObj);
+        renderFiles();
+        showToast(`Stored: ${fileObj.title}`);
+      };
+    }
+
+    async function handleFileInput(e) {
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+
+      for (let f of files) {
+        await processAndSaveFile(f);
+      }
+      e.target.value = '';
+    }
+
+    function processAndSaveFile(file) {
+      return new Promise((resolve) => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const isCode = ['cpp', 'c', 'py', 'js', 'sh', 'sql', 'html', 'css', 'java', 'json', 'txt', 'md'].includes(ext);
+
+        const reader = new FileReader();
+        if (isCode) {
+          reader.onload = (e) => {
+            const entry = {
+              id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              title: file.name,
+              workspace: currentWorkspace,
+              category: currentCategory !== 'all' ? currentCategory : (categories[0] || 'General'),
+              content: e.target.result,
+              isCode: true,
+              syntax: ext === 'cpp' ? 'cpp' : (ext === 'py' ? 'python' : 'markdown'),
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              updatedAt: new Date().toISOString()
+            };
+            storeFile(entry);
+            resolve();
+          };
+          reader.readAsText(file);
+        } else {
+          reader.onload = (e) => {
+            const entry = {
+              id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              title: file.name,
+              workspace: currentWorkspace,
+              category: currentCategory !== 'all' ? currentCategory : (categories[0] || 'General'),
+              content: e.target.result,
+              isCode: false,
+              type: file.type,
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              updatedAt: new Date().toISOString()
+            };
+            storeFile(entry);
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    function saveManualNote(e) {
+      e.preventDefault();
+      const title = document.getElementById('manualTitle').value.trim();
+      const category = document.getElementById('manualCategory').value;
+      const syntax = document.getElementById('manualSyntax').value;
+      const tags = document.getElementById('manualTags').value.split(',').map(t => t.trim()).filter(Boolean);
+      const content = document.getElementById('manualContent').value;
+
+      const entry = {
+        id: 'doc_' + Date.now(),
+        title,
+        workspace: currentWorkspace,
+        category,
+        content,
+        syntax,
+        tags,
+        isCode: syntax !== 'markdown',
+        size: 'Doc',
+        updatedAt: new Date().toISOString()
+      };
+
+      storeFile(entry);
+      closeNoteModal();
+    }
+
+    function openViewer(file) {
+      document.getElementById('viewTitle').textContent = file.title;
+      document.getElementById('viewCategoryBadge').textContent = file.category;
+      document.getElementById('viewTypeBadge').textContent = file.syntax || file.size;
+
+      const dlBtn = document.getElementById('downloadFileBtn');
+      const body = document.getElementById('viewBody');
+      body.innerHTML = '';
+
+      if (file.isCode || file.syntax) {
+        body.innerHTML = `<pre><code class="language-${file.syntax || 'bash'}">${escapeHtml(file.content)}</code></pre>`;
+        hljs.highlightElement(body.querySelector('code'));
+
+        const blob = new Blob([file.content], { type: 'text/plain' });
+        dlBtn.href = URL.createObjectURL(blob);
+        dlBtn.download = file.title;
+      } else if (file.type && file.type.startsWith('image/')) {
+        body.innerHTML = `<img src="${file.content}" class="max-h-[60vh] mx-auto rounded-lg shadow-md" alt="${escapeHtml(file.title)}" />`;
+        dlBtn.href = file.content;
+        dlBtn.download = file.title;
+      } else {
+        body.innerHTML = `<div class="p-8 text-center text-slate-400"><i data-lucide="file-check" class="w-12 h-12 mx-auto mb-3 text-sky-400"></i><p>Binary or Document file safely stored in Engineers Vault.</p></div>`;
+        dlBtn.href = file.content;
+        dlBtn.download = file.title;
+      }
+
+      document.getElementById('viewModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.add('hidden');
+    }
+
+    function deleteFile(id, e) {
+      e.stopPropagation();
+      if (!confirm("Delete this item permanently?")) return;
+      const tx = db.transaction(['files'], 'readwrite');
+      tx.objectStore('files').delete(id);
+      tx.oncomplete = () => {
+        filesCache = filesCache.filter(f => f.id !== id);
+        renderFiles();
+        showToast("File deleted");
+      };
+    }
+
+    function openNoteModal() {
+      document.getElementById('manualTitle').value = '';
+      document.getElementById('manualContent').value = '';
+      document.getElementById('noteModal').classList.remove('hidden');
+    }
+    function closeNoteModal() {
+      document.getElementById('noteModal').classList.add('hidden');
+    }
+    function openCategoryModal() {
+      document.getElementById('newCategoryInput').value = '';
+      document.getElementById('categoryModal').classList.remove('hidden');
+    }
+    function closeCategoryModal() {
+      document.getElementById('categoryModal').classList.add('hidden');
+    }
+
+    function handleCreateCategory(e) {
+      e.preventDefault();
+      const val = document.getElementById('newCategoryInput').value.trim();
+      if (val && !categories.includes(val)) {
+        categories.push(val);
+        saveCategories();
+        closeCategoryModal();
+        showToast(`Subject "${val}" added`);
+      }
+    }
+
+    function deleteCategory(cat, e) {
+      e.stopPropagation();
+      if (!confirm(`Delete subject "${cat}"?`)) return;
+      categories = categories.filter(c => c !== cat);
+      saveCategories();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      renderFiles();
+    }
+
+    // Drag and Drop
+    function setupDragAndDrop() {
+      const dropZone = document.getElementById('dropZone');
+      ['dragenter', 'dragover'].forEach(name => {
+        window.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.add('drag-hover'); });
+      });
+      ['dragleave', 'drop'].forEach(name => {
+        window.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.remove('drag-hover'); });
+      });
+      window.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files) {
+          for (let f of files) await processAndSaveFile(f);
+        }
+      });
+    }
+
+    function exportVault() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ categories, files: filesCache }, null, 2));
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", `ENGINEERS_BACKUP_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(dl);
+      dl.click();
+      dl.remove();
+      showToast("Backup downloaded");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initDB();
+      loadVault();
+      setupDragAndDrop();
+      lucide.createIcons();
+
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('inset-0');
+      });
+    });
+  </script>
+</body>
+</html>
